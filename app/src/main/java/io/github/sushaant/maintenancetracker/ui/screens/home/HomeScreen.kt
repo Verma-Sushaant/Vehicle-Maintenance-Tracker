@@ -30,12 +30,15 @@ fun HomeScreen() {
     )
 
     val filteredVehicles = vehicles.filter {
-
         it.contains(
             searchText,
             ignoreCase = true
         )
     }
+
+    val totalVehicles = vehicles.size
+
+    val dueSoonCount = 2
 
     Box(
         modifier = Modifier
@@ -107,7 +110,7 @@ fun HomeScreen() {
 
                     item {
 
-                        GarageStatsCard()
+                        GarageStatsCard(totalVehicles, dueSoonCount)
                     }
 
                     items(filteredVehicles) { vehicle ->

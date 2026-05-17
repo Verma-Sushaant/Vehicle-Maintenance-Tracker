@@ -13,7 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun GarageStatsCard() {
+fun GarageStatsCard(
+    totalVehicles: Int,
+    dueSoonCount: Int
+) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -27,7 +30,7 @@ fun GarageStatsCard() {
 
             StatsItem(
                 title = "Vehicles",
-                value = "3"
+                value = totalVehicles.toString()
             )
         }
 
@@ -36,8 +39,8 @@ fun GarageStatsCard() {
         ) {
 
             StatsItem(
-                title = "Services",
-                value = "2"
+                title = "Due soon",
+                value = dueSoonCount.toString()
             )
         }
     }
