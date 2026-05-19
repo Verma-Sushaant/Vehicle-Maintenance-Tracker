@@ -1,28 +1,37 @@
 package io.github.sushaant.maintenancetracker.navigation
 
-sealed class Screen(
-    val route: String
-) {
+sealed class Routes(val route: String) {
 
-    data object Home : Screen("home")
+    data object Home : Routes("home")
 
-    data object VehicleDetail : Screen(
-        "vehicle_detail/{vehicleId}"
-    ) {
+    data object VehicleDetails :
+        Routes("vehicle_details/{vehicleId}") {
 
-        fun createRoute(
-            vehicleId: Int
-        ): String {
-
-            return "vehicle_detail/$vehicleId"
-        }
+        fun createRoute(vehicleId: Int) =
+            "vehicle_details/$vehicleId"
     }
 
-    data object Fuel : Screen("fuel")
+    data object Fuel :
+        Routes("fuel/{vehicleId}") {
 
-    data object Maintenance : Screen("maintenance")
+        fun createRoute(vehicleId: Int) =
+            "fuel/$vehicleId"
+    }
 
-    data object Analytics : Screen("analytics")
+    data object Maintenance :
+        Routes("maintenance/{vehicleId}") {
 
-    data object Profile : Screen("profile")
+        fun createRoute(vehicleId: Int) =
+            "maintenance/$vehicleId"
+    }
+
+    data object Reminder :
+        Routes("reminder/{vehicleId}") {
+
+        fun createRoute(vehicleId: Int) =
+            "reminder/$vehicleId"
+    }
+
+    data object Notifications :
+        Routes("notifications")
 }
