@@ -87,7 +87,24 @@ fun AddFuelDialog(
 
                     modifier = Modifier.fillMaxWidth(),
 
-                    singleLine = true
+                    singleLine = true,
+
+                    colors = OutlinedTextFieldDefaults.colors(
+
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+
+                        focusedBorderColor = CyanAccent,
+                        unfocusedBorderColor = BorderColor,
+
+                        focusedContainerColor = Color(0xFF111827),
+                        unfocusedContainerColor = Color(0xFF111827),
+
+                        focusedLabelColor = CyanAccent,
+                        unfocusedLabelColor = TextSecondary,
+
+                        cursorColor = CyanAccent
+                    )
                 )
 
                 OutlinedTextField(
@@ -104,7 +121,24 @@ fun AddFuelDialog(
 
                     modifier = Modifier.fillMaxWidth(),
 
-                    singleLine = true
+                    singleLine = true,
+
+                    colors = OutlinedTextFieldDefaults.colors(
+
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+
+                        focusedBorderColor = CyanAccent,
+                        unfocusedBorderColor = BorderColor,
+
+                        focusedContainerColor = Color(0xFF111827),
+                        unfocusedContainerColor = Color(0xFF111827),
+
+                        focusedLabelColor = CyanAccent,
+                        unfocusedLabelColor = TextSecondary,
+
+                        cursorColor = CyanAccent
+                    )
                 )
 
                 OutlinedTextField(
@@ -121,7 +155,24 @@ fun AddFuelDialog(
 
                     modifier = Modifier.fillMaxWidth(),
 
-                    singleLine = true
+                    singleLine = true,
+
+                    colors = OutlinedTextFieldDefaults.colors(
+
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+
+                        focusedBorderColor = CyanAccent,
+                        unfocusedBorderColor = BorderColor,
+
+                        focusedContainerColor = Color(0xFF111827),
+                        unfocusedContainerColor = Color(0xFF111827),
+
+                        focusedLabelColor = CyanAccent,
+                        unfocusedLabelColor = TextSecondary,
+
+                        cursorColor = CyanAccent
+                    )
                 )
 
                 // FUEL TYPE DROPDOWN
@@ -154,7 +205,24 @@ fun AddFuelDialog(
 
                         modifier = Modifier
                             .menuAnchor()
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+
+                        colors = OutlinedTextFieldDefaults.colors(
+
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+
+                            focusedBorderColor = CyanAccent,
+                            unfocusedBorderColor = BorderColor,
+
+                            focusedContainerColor = Color(0xFF111827),
+                            unfocusedContainerColor = Color(0xFF111827),
+
+                            focusedLabelColor = CyanAccent,
+                            unfocusedLabelColor = TextSecondary,
+
+                            cursorColor = CyanAccent
+                        )
                     )
 
                     ExposedDropdownMenu(

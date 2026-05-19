@@ -120,7 +120,15 @@ fun AddMaintenanceDialog(
                             unfocusedTextColor = Color.White,
 
                             focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = BorderColor
+                            unfocusedBorderColor = BorderColor,
+
+                            focusedContainerColor = Color(0xFF111827),
+                            unfocusedContainerColor = Color(0xFF111827),
+
+                            focusedLabelColor = CyanAccent,
+                            unfocusedLabelColor = TextSecondary,
+
+                            cursorColor = CyanAccent
                         )
                     )
 
@@ -173,7 +181,15 @@ fun AddMaintenanceDialog(
                         unfocusedTextColor = Color.White,
 
                         focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor
+                        unfocusedBorderColor = BorderColor,
+
+                        focusedContainerColor = Color(0xFF111827),
+                        unfocusedContainerColor = Color(0xFF111827),
+
+                        focusedLabelColor = CyanAccent,
+                        unfocusedLabelColor = TextSecondary,
+
+                        cursorColor = CyanAccent
                     )
                 )
 
@@ -201,7 +217,15 @@ fun AddMaintenanceDialog(
                         unfocusedTextColor = Color.White,
 
                         focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor
+                        unfocusedBorderColor = BorderColor,
+
+                        focusedContainerColor = Color(0xFF111827),
+                        unfocusedContainerColor = Color(0xFF111827),
+
+                        focusedLabelColor = CyanAccent,
+                        unfocusedLabelColor = TextSecondary,
+
+                        cursorColor = CyanAccent
                     )
                 )
             }

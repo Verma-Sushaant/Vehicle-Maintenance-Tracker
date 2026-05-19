@@ -340,10 +340,10 @@ fun FuelOverviewItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MaintenanceTrackerTheme {
-        FuelLogScreen(1)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    MaintenanceTrackerTheme {
+//        FuelLogScreen(1)
+//    }
+//}

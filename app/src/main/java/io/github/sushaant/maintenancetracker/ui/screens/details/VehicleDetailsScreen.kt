@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,15 +38,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.sushaant.maintenancetracker.R
-import io.github.sushaant.maintenancetracker.domain.model.Vehicle
-import io.github.sushaant.maintenancetracker.domain.model.VehicleData
+import io.github.sushaant.maintenancetracker.domain.dummy_data.FuelData
+import io.github.sushaant.maintenancetracker.domain.dummy_data.MaintenanceData
+import io.github.sushaant.maintenancetracker.domain.dummy_data.ReminderData
+import io.github.sushaant.maintenancetracker.domain.dummy_data.VehicleData
 import io.github.sushaant.maintenancetracker.ui.screens.details.components.MiniAnalyticsCard
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
 import io.github.sushaant.maintenancetracker.ui.theme.BorderColor
@@ -60,12 +63,50 @@ import io.github.sushaant.maintenancetracker.ui.theme.TextSecondary
 
 @Composable
 fun VehicleDetailScreen(
+
     vehicleId: Int,
-    onBackClick: () -> Unit = {}
+
+    onBackClick: () -> Unit = {},
+
+    onFuelClick: () -> Unit = {},
+
+    onMaintenanceClick: () -> Unit = {},
+
+    onReminderClick: () -> Unit = {}
 ) {
 
     val vehicle = VehicleData.vehicles.firstOrNull {
         it.id == vehicleId
+    }
+
+    val fuelEntries = FuelData.fuelEntries.filter {
+        it.vehicleId == vehicleId
+    }
+
+    val maintenanceEntries = MaintenanceData.maintenanceEntries.filter {
+        it.vehicleId == vehicleId
+    }
+
+    val totalFuelExpense = fuelEntries.sumOf {
+        it.totalCost
+    }
+
+    val totalLitres = fuelEntries.sumOf {
+        it.litres
+    }
+
+    val avgMileage =
+        if (fuelEntries.size >= 2) {
+
+            val first = fuelEntries.first()
+            val last = fuelEntries.last()
+
+            (last.odometer - first.odometer) / totalLitres
+
+        } else 0.0
+
+    val reminders = ReminderData.reminders.filter {
+        it.vehicleId == vehicleId
     }
 
     if (vehicle == null) {
@@ -252,28 +293,29 @@ fun VehicleDetailScreen(
             }
 
             // MAINTENANCE
-            item {
+            val hasUrgentOrAvg = reminders.any { it.priority == "Urgent" || it.priority == "Average" }
+            if(hasUrgentOrAvg) {
+                item {
 
-                SectionTitle(
-                    title = "Maintenance"
-                )
+                    SectionTitle(
+                        title = "Maintenance"
+                    )
+                }
             }
 
-            item {
+            items(
+                reminders
+                    .filter { it.priority == "Urgent" || it.priority == "Average"} // only urgent reminders
+                    .take(2) // then take the first two
+            ) { reminder ->
 
                 ReminderCard(
-                    title = "Oil Change",
-                    daysLeft = "3 Days Left"
+                    title = reminder.title,
+                    daysLeft = reminder.dueInDays,
+                    priority = reminder.priority
                 )
             }
 
-            item {
-
-                ReminderCard(
-                    title = "Brake Inspection",
-                    daysLeft = "7 Days Left"
-                )
-            }
 
             // QUICK ACTIONS
             item {
@@ -292,17 +334,20 @@ fun VehicleDetailScreen(
 
                     ActionButton(
                         icon = Icons.Default.LocalGasStation,
-                        title = "Fuel Log"
+                        title = "Fuel Log",
+                        onClick = onFuelClick
                     )
 
                     ActionButton(
                         icon = Icons.Default.Build,
-                        title = "Service"
+                        title = "Service",
+                        onClick = onMaintenanceClick
                     )
 
                     ActionButton(
                         icon = Icons.Default.Notifications,
-                        title = "Reminder"
+                        title = "Reminder",
+                        onClick = onReminderClick
                     )
                 }
             }
@@ -366,65 +411,20 @@ fun QuickInfoChip(
 }
 
 @Composable
-fun PlaceholderCard(
-    title: String,
-    subtitle: String
-) {
-
-    Box(
-
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(180.dp)
-
-            .background(
-                color = SurfaceDark,
-                shape = RoundedCornerShape(28.dp)
-            )
-
-            .border(
-                width = 1.dp,
-                color = BorderColor,
-                shape = RoundedCornerShape(28.dp)
-            )
-
-            .padding(22.dp)
-    ) {
-
-        Column {
-
-            Text(
-                text = title,
-                color = TextPrimary,
-                fontSize = 18.sp
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = subtitle,
-                color = TextSecondary
-            )
-        }
-    }
-}
-
-@Composable
 fun ReminderCard(
     title: String,
-    daysLeft: String
+    daysLeft: Int,
+    priority: String
 ) {
 
     Row(
 
         modifier = Modifier
             .fillMaxWidth()
-
             .background(
                 color = SurfaceDark,
                 shape = RoundedCornerShape(24.dp)
             )
-
             .padding(18.dp),
 
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -442,8 +442,20 @@ fun ReminderCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = daysLeft,
-                color = PurpleAccent
+                text =
+                    if (daysLeft == 1)
+                        "1 day left"
+                    else
+                        "$daysLeft days left",
+
+                color = when (priority) {
+
+                    "Urgent" -> Color(0xFFFF5252)
+
+                    "Average" -> Color(0xFFFFC107)
+
+                    else -> Color(0xFF4CAF50)
+                }
             )
         }
 
@@ -451,9 +463,16 @@ fun ReminderCard(
 
             modifier = Modifier
                 .size(14.dp)
-
                 .background(
-                    color = PurpleAccent,
+                    color = when (priority) {
+
+                        "Urgent" -> Color(0xFFFF5252)
+
+                        "Average" -> Color(0xFFFFC107)
+
+                        else -> Color(0xFF4CAF50)
+                    },
+
                     shape = CircleShape
                 )
         )
@@ -462,8 +481,9 @@ fun ReminderCard(
 
 @Composable
 fun ActionButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String
+    icon: ImageVector,
+    title: String,
+    onClick: () -> Unit
 ) {
 
     ElevatedCard(
@@ -472,6 +492,8 @@ fun ActionButton(
             width = 100.dp,
             height = 100.dp
         ),
+
+        onClick = onClick,
 
         colors = CardDefaults.elevatedCardColors(
             containerColor = SurfaceLight
@@ -507,5 +529,5 @@ fun ActionButton(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun see() {
-    VehicleDetailScreen(1,{})
+    VehicleDetailScreen(2,{})
 }

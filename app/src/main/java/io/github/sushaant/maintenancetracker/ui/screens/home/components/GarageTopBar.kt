@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun GarageTopBar() {
+fun GarageTopBar(onNotificationClick: () -> Unit) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -45,7 +45,7 @@ fun GarageTopBar() {
             )
         }
 
-        IconButton(onClick = { }) {
+        IconButton(onClick = onNotificationClick) {
 
             Icon(
                 imageVector = Icons.Outlined.Notifications,

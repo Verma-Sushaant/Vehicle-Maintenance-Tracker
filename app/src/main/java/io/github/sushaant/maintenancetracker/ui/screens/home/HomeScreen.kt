@@ -8,14 +8,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.sushaant.maintenancetracker.R
-import io.github.sushaant.maintenancetracker.domain.model.Vehicle
-import io.github.sushaant.maintenancetracker.domain.model.VehicleData
+import io.github.sushaant.maintenancetracker.domain.dummy_data.VehicleData
 import io.github.sushaant.maintenancetracker.ui.screens.home.components.*
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
 
 @Composable
-fun HomeScreen(onVehicleClick: (Int) -> Unit) {
+fun HomeScreen(
+    onVehicleClick: (Int) -> Unit,
+
+    onNotificationClick: () -> Unit
+) {
 
     var showAddVehicleDialog by remember {
         mutableStateOf(false)
@@ -80,7 +82,7 @@ fun HomeScreen(onVehicleClick: (Int) -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
 
-                    GarageTopBar()
+                    GarageTopBar(onNotificationClick)
 
                     SearchBar(
 

@@ -167,10 +167,10 @@ fun MaintenanceScreen(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun GreetingPreview() {
-    MaintenanceTrackerTheme {
-        MaintenanceScreen(1)
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun GreetingPreview() {
+//    MaintenanceTrackerTheme {
+//        MaintenanceScreen(1)
+//    }
+//}
