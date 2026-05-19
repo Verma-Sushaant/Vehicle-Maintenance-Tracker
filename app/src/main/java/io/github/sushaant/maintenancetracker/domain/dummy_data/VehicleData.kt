@@ -1,6 +1,7 @@
-package io.github.sushaant.maintenancetracker.domain.model
+package io.github.sushaant.maintenancetracker.domain.dummy_data
 
 import io.github.sushaant.maintenancetracker.R
+import io.github.sushaant.maintenancetracker.domain.model.Vehicle
 
 object VehicleData {
 
