@@ -1,11 +1,11 @@
-// VehicleCard.kt
-
 package io.github.sushaant.maintenancetracker.ui.screens.home.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,28 +16,33 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.sushaant.maintenancetracker.domain.model.Vehicle
 import io.github.sushaant.maintenancetracker.ui.theme.BorderColor
 import io.github.sushaant.maintenancetracker.ui.theme.CyanGlow
 import io.github.sushaant.maintenancetracker.ui.theme.PurpleGlow
 
 @Composable
 fun VehicleCard(
-    vehicleName: String
+    vehicle: Vehicle,
+    onClick: () -> Unit
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(260.dp)
 
             .shadow(
-                elevation = 22.dp,
+                elevation = 24.dp,
                 shape = RoundedCornerShape(30.dp),
                 ambientColor = CyanGlow,
                 spotColor = PurpleGlow
@@ -59,17 +64,55 @@ fun VehicleCard(
                 shape = RoundedCornerShape(30.dp)
             )
 
-            .clickable { }
-
-            .padding(22.dp),
-
-        verticalArrangement = Arrangement.SpaceBetween
+            .clickable {
+                onClick()
+            }
     ) {
 
-        Column {
+        // IMAGE SECTION
+        Box {
+
+            Image(
+                painter = painterResource(id = vehicle.imageRes),
+                contentDescription = null,
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 30.dp,
+                            topEnd = 30.dp
+                        )
+                    ),
+
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color(0xAA111827)
+                            )
+                        )
+                    )
+            )
+        }
+
+        Column(
+            modifier = Modifier.padding(20.dp),
+
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
 
             Text(
-                text = vehicleName,
+                text = vehicle.name,
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -78,26 +121,28 @@ fun VehicleCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Petrol • Automatic",
+                text = "${vehicle.modelYear} • ${vehicle.fuelType} • ${vehicle.transmission}",
                 color = Color.LightGray
             )
-        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
+            Spacer(modifier = Modifier.height(18.dp))
 
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
 
-            VehicleInfo(
-                title = "Mileage",
-                value = "14 km/l"
-            )
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-            VehicleInfo(
-                title = "Next Service",
-                value = "12 Days"
-            )
+                VehicleInfo(
+                    title = "Mileage",
+                    value = vehicle.mileage
+                )
+
+                VehicleInfo(
+                    title = "Service",
+                    value = "12 Days"
+                )
+            }
         }
     }
 }

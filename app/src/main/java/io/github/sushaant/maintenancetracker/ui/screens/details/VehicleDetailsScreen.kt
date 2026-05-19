@@ -1,5 +1,6 @@
 package io.github.sushaant.maintenancetracker.ui.screens.details
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -31,11 +33,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.sushaant.maintenancetracker.R
+import io.github.sushaant.maintenancetracker.domain.model.Vehicle
+import io.github.sushaant.maintenancetracker.domain.model.VehicleData
+import io.github.sushaant.maintenancetracker.ui.screens.details.components.MiniAnalyticsCard
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
 import io.github.sushaant.maintenancetracker.ui.theme.BorderColor
 import io.github.sushaant.maintenancetracker.ui.theme.CyanAccent
@@ -49,11 +60,35 @@ import io.github.sushaant.maintenancetracker.ui.theme.TextSecondary
 
 @Composable
 fun VehicleDetailScreen(
+    vehicleId: Int,
     onBackClick: () -> Unit = {}
 ) {
 
+    val vehicle = VehicleData.vehicles.firstOrNull {
+        it.id == vehicleId
+    }
+
+    if (vehicle == null) {
+
+        Box(
+            modifier = Modifier.statusBarsPadding()
+                .fillMaxSize()
+                .background(BackgroundDark),
+
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                text = "Vehicle Not Found",
+                color = Color.White
+            )
+        }
+
+        return
+    }
+
     Box(
-        modifier = Modifier
+        modifier = Modifier.statusBarsPadding()
             .fillMaxSize()
             .background(BackgroundDark)
     ) {
@@ -92,84 +127,104 @@ fun VehicleDetailScreen(
 
                     Spacer(modifier = Modifier.width(10.dp))
 
-                    Text(
-                        text = "Vehicle Details",
-                        color = TextPrimary,
-                        fontSize = 24.sp
-                    )
+                    Column {
+
+                        Text(
+                            text = vehicle.name,
+                            color = TextPrimary,
+                            fontSize = 24.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
+                        Text(
+                            text = "${vehicle.modelYear} • ${vehicle.transmission}",
+                            color = TextSecondary,
+                            fontSize = 13.sp
+                        )
+                    }
                 }
             }
 
-            // HERO CARD
+            // IMAGE
             item {
 
                 Box(
 
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
-
-                        .shadow(
-                            elevation = 24.dp,
-                            shape = RoundedCornerShape(32.dp),
-                            ambientColor = CyanGlow,
-                            spotColor = PurpleGlow
-                        )
-
-                        .border(
-                            width = 1.dp,
-                            color = BorderColor,
-                            shape = RoundedCornerShape(32.dp)
-                        )
-
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFF1B2335),
-                                    Color(0xFF111827)
-                                )
-                            ),
-                            shape = RoundedCornerShape(32.dp)
-                        )
-
-                        .padding(24.dp)
+                        .height(230.dp)
+                        .clip(RoundedCornerShape(20.dp))
                 ) {
 
-                    Column(
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    Image(
+                        painter = painterResource(id = vehicle.imageRes),
+                        contentDescription = null,
 
-                        Column {
+                        modifier = Modifier.fillMaxSize(),
 
-                            Text(
-                                text = "BMW M4 Competition",
-                                color = TextPrimary,
-                                fontSize = 28.sp
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // DARK OVERLAY
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color(0xCC111827)
+                                    )
+                                )
                             )
+                    )
 
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "2022 Model",
-                                color = TextSecondary
+                    // BORDER
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .border(
+                                width = 1.dp,
+                                color = BorderColor,
+                                shape = RoundedCornerShape(20.dp)
                             )
-                        }
+                    )
+                }
+            }
 
-                        Row(
+            // INFO CHIPS
+            item {
 
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
+                Row(
 
-                            QuickInfoChip(
-                                title = "Mileage",
-                                value = "14 km/l"
-                            )
+                    modifier = Modifier.fillMaxWidth(),
 
-                            QuickInfoChip(
-                                title = "Fuel",
-                                value = "Petrol"
-                            )
-                        }
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        QuickInfoChip(
+                            title = "Mileage",
+                            value = vehicle.mileage
+                        )
+                    }
+
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        QuickInfoChip(
+                            title = "Fuel",
+                            value = vehicle.fuelType
+                        )
+                    }
+
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        QuickInfoChip(
+                            title = "Service",
+                            value = "3 Days"
+                        )
                     }
                 }
             }
@@ -184,9 +239,15 @@ fun VehicleDetailScreen(
 
             item {
 
-                PlaceholderCard(
-                    title = "Fuel Consumption Graph",
-                    subtitle = "Analytics integration coming next"
+                MiniAnalyticsCard(
+
+                    monthlyExpense = "₹8,400",
+
+                    yearlyExpense = "₹92,000",
+
+                    mileage = "14 km/l",
+
+                    highestExpenseMonth = "July"
                 )
             }
 
@@ -269,9 +330,16 @@ fun QuickInfoChip(
 
     Surface(
 
+        modifier = Modifier.fillMaxWidth().shadow(
+            elevation = 10.dp,
+            shape = RoundedCornerShape(18.dp),
+            ambientColor = CyanGlow,
+            spotColor = PurpleGlow
+        ),
+
         shape = RoundedCornerShape(18.dp),
 
-        color = SurfaceLight
+        color = Color(0xFF1A2234)
     ) {
 
         Column(
@@ -290,7 +358,8 @@ fun QuickInfoChip(
 
             Text(
                 text = value,
-                color = TextPrimary
+                color = TextPrimary,
+                fontStyle = FontStyle.Italic
             )
         }
     }
@@ -433,4 +502,10 @@ fun ActionButton(
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun see() {
+    VehicleDetailScreen(1,{})
 }

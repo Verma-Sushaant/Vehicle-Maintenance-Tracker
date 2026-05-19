@@ -1,5 +1,3 @@
-// FloatingBottomBar.kt
-
 package io.github.sushaant.maintenancetracker.ui.screens.home.components
 
 import androidx.compose.foundation.background
@@ -108,10 +106,4 @@ fun FloatingBottomBar(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun see() {
-    FloatingBottomBar({})
 }

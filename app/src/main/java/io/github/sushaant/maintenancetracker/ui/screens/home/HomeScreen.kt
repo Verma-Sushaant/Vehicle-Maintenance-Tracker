@@ -8,11 +8,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.sushaant.maintenancetracker.R
+import io.github.sushaant.maintenancetracker.domain.model.Vehicle
+import io.github.sushaant.maintenancetracker.domain.model.VehicleData
 import io.github.sushaant.maintenancetracker.ui.screens.home.components.*
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onVehicleClick: (Int) -> Unit) {
 
     var showAddVehicleDialog by remember {
         mutableStateOf(false)
@@ -22,15 +25,10 @@ fun HomeScreen() {
         mutableStateOf("")
     }
 
-    val vehicles = listOf(
-        "BMW M4 Competition",
-        "Audi R8",
-        "Toyota Supra",
-        "Honda Civic"
-    )
+    val vehicles = VehicleData.vehicles
 
     val filteredVehicles = vehicles.filter {
-        it.contains(
+        it.name.contains(
             searchText,
             ignoreCase = true
         )
@@ -41,7 +39,7 @@ fun HomeScreen() {
     val dueSoonCount = 2
 
     Box(
-        modifier = Modifier
+        modifier = Modifier.statusBarsPadding()
             .fillMaxSize()
             .background(BackgroundDark)
     ) {
@@ -116,7 +114,8 @@ fun HomeScreen() {
                     items(filteredVehicles) { vehicle ->
 
                         VehicleCard(
-                            vehicleName = vehicle
+                            vehicle = vehicle,
+                            onClick = { onVehicleClick(vehicle.id) }
                         )
                     }
                 }
