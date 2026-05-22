@@ -4,9 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -23,7 +32,12 @@ fun MiniAnalyticsCard(
     monthlyExpense: String,
     yearlyExpense: String,
     mileage: String,
-    highestExpenseMonth: String
+    highestExpenseMonth: String,
+    highestExpenseDate: String,
+    fuelEfficiencyProgress: Float,
+    serviceHealthProgress: Float,
+    monthlyUsageProgress: Float,
+    tripPerformanceProgress: Float
 ) {
 
     Column(
@@ -90,40 +104,93 @@ fun MiniAnalyticsCard(
 
             AnalyticsProgressItem(
                 label = "Fuel Efficiency",
-                progress = 0.78f
+                progress = fuelEfficiencyProgress
             )
 
             AnalyticsProgressItem(
                 label = "Service Health",
-                progress = 0.92f
+                progress = serviceHealthProgress
             )
 
             AnalyticsProgressItem(
                 label = "Monthly Fuel Usage",
-                progress = 0.64f
+                progress = monthlyUsageProgress
             )
 
             AnalyticsProgressItem(
                 label = "Trip Performance",
-                progress = 0.84f
+                progress = tripPerformanceProgress
             )
         }
 
         // INSIGHT
+        var showDateInfo by remember {
+            mutableStateOf(false)
+        }
+
         Column {
 
-            Text(
-                text = "Insight",
-                color = CyanAccent,
-                fontWeight = FontWeight.SemiBold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = "Insight",
+                    color = CyanAccent,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                IconButton(
+                    onClick = {
+                        showDateInfo = !showDateInfo
+                    }
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = CyanAccent,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Highest fuel expense recorded in $highestExpenseMonth.",
+                text =
+                    "Highest fuel expense recorded in $highestExpenseMonth.",
                 color = TextSecondary
             )
+
+            if (showDateInfo) {
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Surface(
+
+                    color = SurfaceLight,
+
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+
+                    Text(
+
+                        text = "On $highestExpenseDate",
+
+                        modifier = Modifier.padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        ),
+
+                        color = TextPrimary,
+
+                        fontSize = 12.sp
+                    )
+                }
+            }
         }
     }
 }

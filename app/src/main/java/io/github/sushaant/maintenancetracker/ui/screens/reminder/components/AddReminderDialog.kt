@@ -80,22 +80,7 @@ fun AddReminderDialog(
 
                     modifier = Modifier.fillMaxWidth(),
 
-                    colors = OutlinedTextFieldDefaults.colors(
-
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor,
-
-                        focusedContainerColor = Color(0xFF111827),
-                        unfocusedContainerColor = Color(0xFF111827),
-
-                        focusedLabelColor = CyanAccent,
-                        unfocusedLabelColor = TextSecondary,
-
-                        cursorColor = CyanAccent
-                    )
+                    colors = customTextFieldColors()
                 )
 
                 OutlinedTextField(
@@ -112,22 +97,7 @@ fun AddReminderDialog(
 
                     modifier = Modifier.fillMaxWidth(),
 
-                    colors = OutlinedTextFieldDefaults.colors(
-
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor,
-
-                        focusedContainerColor = Color(0xFF111827),
-                        unfocusedContainerColor = Color(0xFF111827),
-
-                        focusedLabelColor = CyanAccent,
-                        unfocusedLabelColor = TextSecondary,
-
-                        cursorColor = CyanAccent
-                    )
+                    colors = customTextFieldColors()
                 )
 
                 ExposedDropdownMenuBox(
@@ -161,22 +131,7 @@ fun AddReminderDialog(
                             .menuAnchor()
                             .fillMaxWidth(),
 
-                        colors = OutlinedTextFieldDefaults.colors(
-
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-
-                            focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = BorderColor,
-
-                            focusedContainerColor = Color(0xFF111827),
-                            unfocusedContainerColor = Color(0xFF111827),
-
-                            focusedLabelColor = CyanAccent,
-                            unfocusedLabelColor = TextSecondary,
-
-                            cursorColor = CyanAccent
-                        )
+                        colors = customTextFieldColors()
                     )
 
                     ExposedDropdownMenu(
@@ -248,3 +203,21 @@ fun AddReminderDialog(
         }
     )
 }
+
+@Composable
+fun customTextFieldColors() = OutlinedTextFieldDefaults.colors(
+
+    focusedTextColor = Color.White,
+    unfocusedTextColor = Color.White,
+
+    focusedBorderColor = CyanAccent,
+    unfocusedBorderColor = BorderColor,
+
+    focusedContainerColor = Color(0xFF111827),
+    unfocusedContainerColor = Color(0xFF111827),
+
+    focusedLabelColor = CyanAccent,
+    unfocusedLabelColor = TextSecondary,
+
+    cursorColor = CyanAccent
+)

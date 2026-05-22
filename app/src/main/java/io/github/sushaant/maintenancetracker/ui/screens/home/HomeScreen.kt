@@ -1,16 +1,31 @@
 package io.github.sushaant.maintenancetracker.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.sushaant.maintenancetracker.domain.dummy_data.VehicleData
-import io.github.sushaant.maintenancetracker.ui.screens.home.components.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.AddVehicleDialog
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.FloatingBottomBar
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.GarageStatsCard
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.GarageTopBar
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.SearchBar
+import io.github.sushaant.maintenancetracker.ui.screens.home.components.VehicleCard
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
+import io.github.sushaant.maintenancetracker.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
@@ -19,24 +34,20 @@ fun HomeScreen(
     onNotificationClick: () -> Unit
 ) {
 
-    var showAddVehicleDialog by remember {
-        mutableStateOf(false)
-    }
+    val viewModel: HomeViewModel = viewModel()
 
-    var searchText by remember {
-        mutableStateOf("")
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val vehicles = VehicleData.vehicles
+    val filteredVehicles =
+        uiState.vehicles.filter {
 
-    val filteredVehicles = vehicles.filter {
-        it.name.contains(
-            searchText,
-            ignoreCase = true
-        )
-    }
+            it.name.contains(
+                uiState.searchText,
+                ignoreCase = true
+            )
+        }
 
-    val totalVehicles = vehicles.size
+    val totalVehicles = uiState.vehicles.size
 
     val dueSoonCount = 2
 
@@ -55,7 +66,7 @@ fun HomeScreen(
                 FloatingBottomBar(
 
                     onAddClick = {
-                        showAddVehicleDialog = true
+                        viewModel.showDialog()
                     }
                 )
             }
@@ -86,10 +97,10 @@ fun HomeScreen(
 
                     SearchBar(
 
-                        searchText = searchText,
+                        searchText = uiState.searchText,
 
                         onSearchTextChange = {
-                            searchText = it
+                            viewModel.onSearchChange(it)
                         }
                     )
                 }
@@ -124,12 +135,12 @@ fun HomeScreen(
             }
         }
 
-        if (showAddVehicleDialog) {
+        if (uiState.showAddVehicleDialog) {
 
             AddVehicleDialog(
 
                 onDismiss = {
-                    showAddVehicleDialog = false
+                    viewModel.hideDialog()
                 }
             )
         }

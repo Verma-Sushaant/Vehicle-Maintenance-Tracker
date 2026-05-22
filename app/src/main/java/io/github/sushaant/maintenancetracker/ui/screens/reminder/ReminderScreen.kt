@@ -1,26 +1,48 @@
 package io.github.sushaant.maintenancetracker.ui.screens.reminder
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AddAlert
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.sushaant.maintenancetracker.domain.dummy_data.ReminderData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sushaant.maintenancetracker.domain.model.Reminder
 import io.github.sushaant.maintenancetracker.ui.screens.reminder.components.AddReminderDialog
 import io.github.sushaant.maintenancetracker.ui.screens.reminder.components.ReminderCard
-import io.github.sushaant.maintenancetracker.ui.theme.*
+import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
+import io.github.sushaant.maintenancetracker.ui.theme.CyanAccent
+import io.github.sushaant.maintenancetracker.ui.theme.PurpleAccent
+import io.github.sushaant.maintenancetracker.ui.theme.SurfaceLight
+import io.github.sushaant.maintenancetracker.ui.theme.TextPrimary
+import io.github.sushaant.maintenancetracker.ui.theme.TextSecondary
+import io.github.sushaant.maintenancetracker.ui.viewmodel.ReminderViewModel
+import io.github.sushaant.maintenancetracker.ui.viewmodel.factory.ReminderViewModelFactory
 
 @Composable
 fun ReminderScreen(
@@ -29,20 +51,14 @@ fun ReminderScreen(
 
     onBackClick: () -> Unit = {}
 ) {
-
-    var reminders by remember {
-
-        mutableStateOf(
-
-            ReminderData.reminders.filter {
-                it.vehicleId == vehicleId
-            }
+    val viewModel: ReminderViewModel =
+        viewModel(
+            factory = ReminderViewModelFactory(vehicleId)
         )
-    }
 
-    var showDialog by remember {
-        mutableStateOf(false)
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val reminders = uiState.reminders
 
     Box(
 
@@ -76,7 +92,7 @@ fun ReminderScreen(
                     ) {
 
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = null,
                             tint = Color.White
                         )
@@ -113,7 +129,7 @@ fun ReminderScreen(
         FloatingActionButton(
 
             onClick = {
-                showDialog = true
+                viewModel.showDialog()
             },
 
             modifier = Modifier
@@ -131,17 +147,17 @@ fun ReminderScreen(
         }
     }
 
-    if (showDialog) {
+    if (uiState.showDialog) {
 
         AddReminderDialog(
 
             onDismiss = {
-                showDialog = false
+                viewModel.hideDialog()
             },
 
             onSave = { title, days, priority ->
 
-                reminders = reminders + Reminder(
+                val newReminder = Reminder(
 
                     id = reminders.size + 1,
 
@@ -156,7 +172,9 @@ fun ReminderScreen(
                     status = "Pending"
                 )
 
-                showDialog = false
+                viewModel.addReminder(newReminder)
+
+                viewModel.hideDialog()
             }
         )
     }
@@ -219,6 +237,6 @@ fun ReminderOverviewCard(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun see() {
-    ReminderScreen(1)
+fun See() {
+    ReminderScreen(2)
 }

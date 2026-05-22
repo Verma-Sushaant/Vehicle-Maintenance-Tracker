@@ -1,31 +1,41 @@
 package io.github.sushaant.maintenancetracker.ui.screens.maintenance
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material3.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.sushaant.maintenancetracker.domain.dummy_data.MaintenanceData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sushaant.maintenancetracker.domain.model.MaintenanceEntry
-import io.github.sushaant.maintenancetracker.ui.screens.fuel.FuelLogScreen
 import io.github.sushaant.maintenancetracker.ui.screens.maintenance.components.AddMaintenanceDialog
 import io.github.sushaant.maintenancetracker.ui.screens.maintenance.components.MaintenanceCard
 import io.github.sushaant.maintenancetracker.ui.screens.maintenance.components.MaintenanceOverviewCard
-import io.github.sushaant.maintenancetracker.ui.theme.*
+import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
+import io.github.sushaant.maintenancetracker.ui.theme.CyanAccent
+import io.github.sushaant.maintenancetracker.ui.theme.TextPrimary
+import io.github.sushaant.maintenancetracker.ui.viewmodel.MaintenanceViewModel
+import io.github.sushaant.maintenancetracker.ui.viewmodel.factory.MaintenanceViewModelFactory
 
 @Composable
 fun MaintenanceScreen(
@@ -34,24 +44,17 @@ fun MaintenanceScreen(
 
     onBackClick: () -> Unit = {}
 ) {
-
-    var maintenanceEntries by remember {
-
-        mutableStateOf(
-            MaintenanceData
-                .maintenanceEntries
-                .filter {
-                    it.vehicleId == vehicleId
-                }
+    val viewModel: MaintenanceViewModel =
+        viewModel(
+            factory = MaintenanceViewModelFactory(vehicleId)
         )
-    }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val maintenanceEntries = uiState.maintenanceEntries
 
     val totalCost = maintenanceEntries.sumOf {
         it.cost
-    }
-
-    var showDialog by remember {
-        mutableStateOf(false)
     }
 
     Box(
@@ -81,7 +84,7 @@ fun MaintenanceScreen(
                     ) {
 
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = null,
                             tint = Color.White
                         )
@@ -116,7 +119,7 @@ fun MaintenanceScreen(
         FloatingActionButton(
 
             onClick = {
-                showDialog = true
+                viewModel.showDialog()
             },
 
             modifier = Modifier
@@ -133,12 +136,12 @@ fun MaintenanceScreen(
             )
         }
     }
-    if (showDialog) {
+    if (uiState.showDialog) {
 
         AddMaintenanceDialog(
 
             onDismiss = {
-                showDialog = false
+                viewModel.hideDialog()
             },
 
             onSave = { type, cost, notes ->
@@ -158,10 +161,9 @@ fun MaintenanceScreen(
                     notes = notes
                 )
 
-                maintenanceEntries =
-                    maintenanceEntries + newMaintenance
+                viewModel.addMaintenance(newMaintenance)
 
-                showDialog = false
+                viewModel.hideDialog()
             }
         )
     }

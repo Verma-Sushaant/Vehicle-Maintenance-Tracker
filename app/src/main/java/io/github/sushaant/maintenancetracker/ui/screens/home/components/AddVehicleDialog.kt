@@ -8,7 +8,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -84,7 +86,7 @@ fun AddVehicleDialog(
 
             shape = RoundedCornerShape(30.dp),
 
-            color = DialogColor
+            color = SurfaceDark
         ) {
 
             Column(
@@ -134,7 +136,7 @@ fun AddVehicleDialog(
 
                         selectedItem = selectedModel,
 
-                        enabled = true,
+                        enabled = selectedBrand.isNotEmpty(),
 
                         onExpandedAttempt = {
 
@@ -168,12 +170,17 @@ fun AddVehicleDialog(
                         value = selectedYear,
 
                         onValueChange = {
-                            selectedYear = it
+
+                            selectedYear = it.filter { char ->
+                                char.isDigit()
+                            }.take(4)
                         },
 
                         modifier = Modifier.fillMaxWidth(),
 
                         enabled = selectedModel.isNotEmpty(),
+
+                        singleLine = true,
 
                         label = {
                             Text("Year")
@@ -181,20 +188,7 @@ fun AddVehicleDialog(
 
                         shape = RoundedCornerShape(18.dp),
 
-                        colors = OutlinedTextFieldDefaults.colors(
-
-                            focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary,
-
-                            focusedBorderColor = PurpleAccent,
-                            unfocusedBorderColor = BorderColor,
-
-                            focusedLabelColor = PurpleAccent,
-                            unfocusedLabelColor = TextSecondary,
-
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight
-                        )
+                        colors = customTextFieldColors()
                     )
 
                     if (
@@ -212,28 +206,84 @@ fun AddVehicleDialog(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Button(
+                Row(
 
-                    onClick = { },
+                    modifier = Modifier.fillMaxWidth(),
 
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(58.dp),
-
-                    shape = RoundedCornerShape(18.dp),
-
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PurpleAccent
-                    )
-
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 
-                    Text(
-                        text = "Add Vehicle",
-                        fontSize = 16.sp
-                    )
+                    OutlinedButton(
+
+                        onClick = onDismiss,
+
+                        modifier = Modifier.weight(1f),
+
+                        shape = RoundedCornerShape(18.dp),
+
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = TextSecondary
+                        )
+                    ) {
+
+                        Text("Cancel")
+                    }
+
+                    Button(
+
+                        onClick = {
+
+                            // later:
+                            // save vehicle
+                        },
+
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(58.dp),
+
+                        shape = RoundedCornerShape(18.dp),
+
+                        enabled =
+                            selectedBrand.isNotEmpty() &&
+                                    selectedModel.isNotEmpty() &&
+                                    selectedYear.length == 4,
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PurpleAccent
+                        )
+                    ) {
+
+                        Text(
+                            text = "Add Vehicle",
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun customTextFieldColors() = OutlinedTextFieldDefaults.colors(
+
+    focusedTextColor = Color.White,
+    unfocusedTextColor = Color.White,
+
+    focusedBorderColor = CyanAccent,
+    unfocusedBorderColor = BorderColor,
+
+    focusedContainerColor = Color(0xFF111827),
+    unfocusedContainerColor = Color(0xFF111827),
+
+    focusedLabelColor = CyanAccent,
+    unfocusedLabelColor = TextSecondary,
+
+    cursorColor = CyanAccent
+)
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun see() {
+    AddVehicleDialog({})
 }

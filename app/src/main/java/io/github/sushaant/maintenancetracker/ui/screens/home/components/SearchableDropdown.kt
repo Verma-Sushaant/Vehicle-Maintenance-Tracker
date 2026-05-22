@@ -63,7 +63,9 @@ fun SearchableDropdown(
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .fillMaxWidth(),
 
-            enabled = enabled,
+            enabled = true,
+
+            readOnly = !enabled,
 
             label = {
                 Text(label)
@@ -73,15 +75,19 @@ fun SearchableDropdown(
 
                 focusedTextColor = TextPrimary,
                 unfocusedTextColor = TextPrimary,
+                disabledTextColor = TextPrimary,
 
                 focusedBorderColor = CyanAccent,
                 unfocusedBorderColor = BorderColor,
+                disabledBorderColor = BorderColor,
 
                 focusedLabelColor = CyanAccent,
                 unfocusedLabelColor = TextSecondary,
+                disabledLabelColor = TextSecondary,
 
                 focusedContainerColor = SurfaceLight,
-                unfocusedContainerColor = SurfaceLight
+                unfocusedContainerColor = SurfaceLight,
+                disabledContainerColor = SurfaceLight
             )
         )
 

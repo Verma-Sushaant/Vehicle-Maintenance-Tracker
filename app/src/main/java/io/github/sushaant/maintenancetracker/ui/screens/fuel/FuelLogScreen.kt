@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.LocalGasStation
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -26,17 +26,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.sushaant.maintenancetracker.domain.dummy_data.FuelData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.sushaant.maintenancetracker.domain.model.FuelEntry
+import io.github.sushaant.maintenancetracker.domain.utils.calculateAverageFuelCostPerLitre
+import io.github.sushaant.maintenancetracker.domain.utils.calculateMileage
+import io.github.sushaant.maintenancetracker.domain.utils.calculateTotalFuelExpense
 import io.github.sushaant.maintenancetracker.ui.screens.fuel.components.AddFuelDialog
 import io.github.sushaant.maintenancetracker.ui.screens.fuel.components.FuelEntryCard
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
@@ -46,6 +47,8 @@ import io.github.sushaant.maintenancetracker.ui.theme.MaintenanceTrackerTheme
 import io.github.sushaant.maintenancetracker.ui.theme.SurfaceLight
 import io.github.sushaant.maintenancetracker.ui.theme.TextPrimary
 import io.github.sushaant.maintenancetracker.ui.theme.TextSecondary
+import io.github.sushaant.maintenancetracker.ui.viewmodel.FuelViewModel
+import io.github.sushaant.maintenancetracker.ui.viewmodel.factory.FuelViewModelFactory
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -56,46 +59,20 @@ fun FuelLogScreen(
     onBackClick: () -> Unit = {}
 ) {
 
-    var showDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var fuelEntries by remember {
-
-        mutableStateOf(
-            FuelData.fuelEntries.filter {
-                it.vehicleId == vehicleId
-            }
+    val viewModel: FuelViewModel =
+        viewModel(
+            factory = FuelViewModelFactory(vehicleId)
         )
-    }
 
-    val totalFuelCost = fuelEntries.sumOf {
-        it.totalCost
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val totalLitres = fuelEntries.sumOf {
-        it.litres
-    }
+    val fuelEntries = uiState.fuelEntries
 
-    val averageCostPerLitre =
-        if (totalLitres > 0) {
-            totalFuelCost / totalLitres
-        } else {
-            0.0
-        }
+    val estimatedMileage = calculateMileage(fuelEntries)
 
-    val estimatedMileage =
-        if (fuelEntries.size >= 2) {
+    val totalFuelCost = calculateTotalFuelExpense(fuelEntries)
 
-            val first = fuelEntries.first()
-            val last = fuelEntries.last()
-
-            val distance = last.odometer - first.odometer
-
-            distance / totalLitres
-        } else {
-            0.0
-        }
+    val averageCostPerLitre = calculateAverageFuelCostPerLitre(fuelEntries)
 
     Box(
 
@@ -130,7 +107,7 @@ fun FuelLogScreen(
                     ) {
 
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = null,
                             tint = Color.White
                         )
@@ -189,7 +166,7 @@ fun FuelLogScreen(
         FloatingActionButton(
 
             onClick = {
-                showDialog = true
+                viewModel.showDialog()
             },
 
             modifier = Modifier
@@ -206,12 +183,12 @@ fun FuelLogScreen(
             )
         }
     }
-    if (showDialog) {
+    if (uiState.showDialog) {
 
         AddFuelDialog(
 
             onDismiss = {
-                showDialog = false
+                viewModel.hideDialog()
             },
 
             onSave = { litres, cost, odometer, fuelType ->
@@ -233,9 +210,9 @@ fun FuelLogScreen(
                     date = "Today"
                 )
 
-                fuelEntries = fuelEntries + newEntry
+                viewModel.addFuelEntry(newEntry)
 
-                showDialog = false
+                viewModel.hideDialog()
             }
         )
     }
@@ -340,10 +317,10 @@ fun FuelOverviewItem(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    MaintenanceTrackerTheme {
-//        FuelLogScreen(1)
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    MaintenanceTrackerTheme {
+        FuelLogScreen(1)
+    }
+}

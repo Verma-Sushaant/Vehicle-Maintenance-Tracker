@@ -21,10 +21,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -32,6 +32,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,21 +48,24 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.sushaant.maintenancetracker.domain.dummy_data.FuelData
-import io.github.sushaant.maintenancetracker.domain.dummy_data.MaintenanceData
-import io.github.sushaant.maintenancetracker.domain.dummy_data.ReminderData
-import io.github.sushaant.maintenancetracker.domain.dummy_data.VehicleData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.sushaant.maintenancetracker.domain.utils.calculateHighestExpenseEntry
+import io.github.sushaant.maintenancetracker.domain.utils.calculateHighestExpenseMonth
+import io.github.sushaant.maintenancetracker.domain.utils.calculateMileage
+import io.github.sushaant.maintenancetracker.domain.utils.calculateTotalFuelExpense
 import io.github.sushaant.maintenancetracker.ui.screens.details.components.MiniAnalyticsCard
 import io.github.sushaant.maintenancetracker.ui.theme.BackgroundDark
 import io.github.sushaant.maintenancetracker.ui.theme.BorderColor
 import io.github.sushaant.maintenancetracker.ui.theme.CyanAccent
 import io.github.sushaant.maintenancetracker.ui.theme.CyanGlow
-import io.github.sushaant.maintenancetracker.ui.theme.PurpleAccent
 import io.github.sushaant.maintenancetracker.ui.theme.PurpleGlow
 import io.github.sushaant.maintenancetracker.ui.theme.SurfaceDark
 import io.github.sushaant.maintenancetracker.ui.theme.SurfaceLight
 import io.github.sushaant.maintenancetracker.ui.theme.TextPrimary
 import io.github.sushaant.maintenancetracker.ui.theme.TextSecondary
+import io.github.sushaant.maintenancetracker.ui.viewmodel.VehicleDetailViewModel
+import io.github.sushaant.maintenancetracker.ui.viewmodel.factory.VehicleDetailViewModelFactory
 
 @Composable
 fun VehicleDetailScreen(
@@ -75,39 +81,63 @@ fun VehicleDetailScreen(
     onReminderClick: () -> Unit = {}
 ) {
 
-    val vehicle = VehicleData.vehicles.firstOrNull {
-        it.id == vehicleId
+    val viewModel: VehicleDetailViewModel =
+        viewModel(
+            factory = VehicleDetailViewModelFactory(vehicleId)
+        )
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val vehicle = uiState.vehicle
+
+    val fuelEntries = uiState.fuelEntries
+
+    val reminders = uiState.reminders
+
+    val averageMileage by remember(fuelEntries) {
+        mutableDoubleStateOf(calculateMileage(fuelEntries))
     }
 
-    val fuelEntries = FuelData.fuelEntries.filter {
-        it.vehicleId == vehicleId
+    val totalFuelExpense by remember(fuelEntries) {
+        mutableDoubleStateOf(calculateTotalFuelExpense(fuelEntries))
+
     }
 
-    val maintenanceEntries = MaintenanceData.maintenanceEntries.filter {
-        it.vehicleId == vehicleId
-    }
+    val highestExpense =
+        calculateHighestExpenseEntry(fuelEntries)
 
-    val totalFuelExpense = fuelEntries.sumOf {
-        it.totalCost
-    }
+    val highestExpenseDate =
+        highestExpense?.date ?: ""
 
-    val totalLitres = fuelEntries.sumOf {
-        it.litres
-    }
+    val highestExpenseMonth =
+        calculateHighestExpenseMonth(fuelEntries)
 
-    val avgMileage =
-        if (fuelEntries.size >= 2) {
+    val fuelEfficiencyProgress =
+        (averageMileage / 30.0)
+            .coerceIn(0.0, 1.0)
+            .toFloat()
 
-            val first = fuelEntries.first()
-            val last = fuelEntries.last()
+    val urgentRemindersCount =
+        reminders.count {
+            it.priority == "Urgent"
+        }
 
-            (last.odometer - first.odometer) / totalLitres
+    val serviceHealthProgress =
+        (1f - (urgentRemindersCount * 0.25f))
+            .coerceIn(0f, 1f)
 
-        } else 0.0
+    val monthlyUsageProgress =
+        (totalFuelExpense / 15000.0)
+            .coerceIn(0.0, 1.0)
+            .toFloat()
 
-    val reminders = ReminderData.reminders.filter {
-        it.vehicleId == vehicleId
-    }
+    val tripPerformanceProgress =
+        (
+                (
+                        fuelEfficiencyProgress +
+                                serviceHealthProgress
+                        ) / 2f
+                ).coerceIn(0f, 1f)
 
     if (vehicle == null) {
 
@@ -160,7 +190,7 @@ fun VehicleDetailScreen(
                     ) {
 
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = null,
                             tint = Color.White
                         )
@@ -281,14 +311,23 @@ fun VehicleDetailScreen(
             item {
 
                 MiniAnalyticsCard(
+                    monthlyExpense = "₹${totalFuelExpense.toInt()}",
 
-                    monthlyExpense = "₹8,400",
+                    yearlyExpense = "₹${(totalFuelExpense * 12).toInt()}",
 
-                    yearlyExpense = "₹92,000",
+                    mileage = "${averageMileage.toInt()} km/l",
 
-                    mileage = "14 km/l",
+                    highestExpenseMonth = highestExpenseMonth,
 
-                    highestExpenseMonth = "July"
+                    highestExpenseDate = highestExpenseDate,
+
+                    fuelEfficiencyProgress = fuelEfficiencyProgress,
+
+                    serviceHealthProgress = serviceHealthProgress,
+
+                    monthlyUsageProgress = monthlyUsageProgress,
+
+                    tripPerformanceProgress = tripPerformanceProgress
                 )
             }
 
@@ -306,7 +345,8 @@ fun VehicleDetailScreen(
             items(
                 reminders
                     .filter { it.priority == "Urgent" || it.priority == "Average"} // only urgent reminders
-                    .take(2) // then take the first two
+                    .take(2), // then take the first two
+                key = {it.id}
             ) { reminder ->
 
                 ReminderCard(
@@ -329,26 +369,37 @@ fun VehicleDetailScreen(
 
                 Row(
 
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+
+                    horizontalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
 
-                    ActionButton(
-                        icon = Icons.Default.LocalGasStation,
-                        title = "Fuel Log",
-                        onClick = onFuelClick
-                    )
+                    Box(modifier = Modifier.weight(1f)) {
 
-                    ActionButton(
-                        icon = Icons.Default.Build,
-                        title = "Service",
-                        onClick = onMaintenanceClick
-                    )
+                        ActionButton(
+                            icon = Icons.Default.LocalGasStation,
+                            title = "Fuel Log",
+                            onClick = onFuelClick
+                        )
+                    }
 
-                    ActionButton(
-                        icon = Icons.Default.Notifications,
-                        title = "Reminder",
-                        onClick = onReminderClick
-                    )
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        ActionButton(
+                            icon = Icons.Default.Build,
+                            title = "Service",
+                            onClick = onMaintenanceClick
+                        )
+                    }
+
+                    Box(modifier = Modifier.weight(1f)) {
+
+                        ActionButton(
+                            icon = Icons.Default.Notifications,
+                            title = "Reminder",
+                            onClick = onReminderClick
+                        )
+                    }
                 }
             }
         }
@@ -528,6 +579,6 @@ fun ActionButton(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun see() {
-    VehicleDetailScreen(2,{})
+fun See() {
+    VehicleDetailScreen(1,{})
 }

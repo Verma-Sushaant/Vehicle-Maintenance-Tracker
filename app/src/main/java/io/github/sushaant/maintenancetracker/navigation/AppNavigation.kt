@@ -1,5 +1,10 @@
 package io.github.sushaant.maintenancetracker.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,10 +27,69 @@ fun AppNavigation() {
 
         navController = navController,
 
-        startDestination = Routes.Home.route
-    ) {
+        startDestination = Routes.Home.route,
 
-        // HOME
+        enterTransition = {
+
+            slideInHorizontally(
+
+                initialOffsetX = { fullWidth ->
+                    fullWidth
+                },
+
+                animationSpec = tween(300)
+
+            ) + fadeIn(
+                animationSpec = tween(300)
+            )
+        },
+
+        exitTransition = {
+
+            slideOutHorizontally(
+
+                targetOffsetX = { fullWidth ->
+                    -fullWidth / 4
+                },
+
+                animationSpec = tween(300)
+
+            ) + fadeOut(
+                animationSpec = tween(300)
+            )
+        },
+
+        popEnterTransition = {
+
+            slideInHorizontally(
+
+                initialOffsetX = { fullWidth ->
+                    -fullWidth / 4
+                },
+
+                animationSpec = tween(300)
+
+            ) + fadeIn(
+                animationSpec = tween(300)
+            )
+        },
+
+        popExitTransition = {
+
+            slideOutHorizontally(
+
+                targetOffsetX = { fullWidth ->
+                    fullWidth
+                },
+
+                animationSpec = tween(300)
+
+            ) + fadeOut(
+                animationSpec = tween(300)
+            )
+        }
+
+    ) {
 
         composable(
             route = Routes.Home.route
@@ -49,8 +113,6 @@ fun AppNavigation() {
             )
         }
 
-        // VEHICLE DETAILS
-
         composable(
 
             route = Routes.VehicleDetails.route,
@@ -60,6 +122,7 @@ fun AppNavigation() {
                     type = NavType.IntType
                 }
             )
+
         ) { backStackEntry ->
 
             val vehicleId =
@@ -97,8 +160,6 @@ fun AppNavigation() {
             )
         }
 
-        // FUEL
-
         composable(
 
             route = Routes.Fuel.route,
@@ -108,6 +169,7 @@ fun AppNavigation() {
                     type = NavType.IntType
                 }
             )
+
         ) { backStackEntry ->
 
             val vehicleId =
@@ -124,8 +186,6 @@ fun AppNavigation() {
             )
         }
 
-        // MAINTENANCE
-
         composable(
 
             route = Routes.Maintenance.route,
@@ -135,6 +195,7 @@ fun AppNavigation() {
                     type = NavType.IntType
                 }
             )
+
         ) { backStackEntry ->
 
             val vehicleId =
@@ -151,8 +212,6 @@ fun AppNavigation() {
             )
         }
 
-        // REMINDER
-
         composable(
 
             route = Routes.Reminder.route,
@@ -162,6 +221,7 @@ fun AppNavigation() {
                     type = NavType.IntType
                 }
             )
+
         ) { backStackEntry ->
 
             val vehicleId =
@@ -177,8 +237,6 @@ fun AppNavigation() {
                 }
             )
         }
-
-        // NOTIFICATIONS
 
         composable(
             route = Routes.Notifications.route

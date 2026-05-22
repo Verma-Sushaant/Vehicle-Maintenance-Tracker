@@ -114,22 +114,7 @@ fun AddMaintenanceDialog(
                             Text("Maintenance Type")
                         },
 
-                        colors = OutlinedTextFieldDefaults.colors(
-
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-
-                            focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = BorderColor,
-
-                            focusedContainerColor = Color(0xFF111827),
-                            unfocusedContainerColor = Color(0xFF111827),
-
-                            focusedLabelColor = CyanAccent,
-                            unfocusedLabelColor = TextSecondary,
-
-                            cursorColor = CyanAccent
-                        )
+                        colors = customTextFieldColors()
                     )
 
                     ExposedDropdownMenu(
@@ -175,22 +160,7 @@ fun AddMaintenanceDialog(
                         Text("Cost")
                     },
 
-                    colors = OutlinedTextFieldDefaults.colors(
-
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor,
-
-                        focusedContainerColor = Color(0xFF111827),
-                        unfocusedContainerColor = Color(0xFF111827),
-
-                        focusedLabelColor = CyanAccent,
-                        unfocusedLabelColor = TextSecondary,
-
-                        cursorColor = CyanAccent
-                    )
+                    colors = customTextFieldColors()
                 )
 
                 // NOTES
@@ -211,22 +181,7 @@ fun AddMaintenanceDialog(
 
                     minLines = 3,
 
-                    colors = OutlinedTextFieldDefaults.colors(
-
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = BorderColor,
-
-                        focusedContainerColor = Color(0xFF111827),
-                        unfocusedContainerColor = Color(0xFF111827),
-
-                        focusedLabelColor = CyanAccent,
-                        unfocusedLabelColor = TextSecondary,
-
-                        cursorColor = CyanAccent
-                    )
+                    colors = customTextFieldColors()
                 )
             }
         },
@@ -269,3 +224,21 @@ fun AddMaintenanceDialog(
         }
     )
 }
+
+@Composable
+fun customTextFieldColors() = OutlinedTextFieldDefaults.colors(
+
+    focusedTextColor = Color.White,
+    unfocusedTextColor = Color.White,
+
+    focusedBorderColor = CyanAccent,
+    unfocusedBorderColor = BorderColor,
+
+    focusedContainerColor = Color(0xFF111827),
+    unfocusedContainerColor = Color(0xFF111827),
+
+    focusedLabelColor = CyanAccent,
+    unfocusedLabelColor = TextSecondary,
+
+    cursorColor = CyanAccent
+)
