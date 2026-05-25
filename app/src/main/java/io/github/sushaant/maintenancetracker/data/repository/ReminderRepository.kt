@@ -46,4 +46,14 @@ object ReminderRepository {
 
         notifyChanges()
     }
+
+    fun deleteReminders(vehicleId: Int) {
+
+        _reminders.update { reminders ->
+
+            reminders.filterNot {
+                it.vehicleId == vehicleId
+            }
+        }
+    }
 }

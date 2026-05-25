@@ -27,4 +27,14 @@ object MaintenanceRepository {
             currentEntries + entry
         }
     }
+
+    fun deleteMaintenance(vehicleId: Int) {
+
+        _maintenanceEntries.update { entries ->
+
+            entries.filterNot {
+                it.vehicleId == vehicleId
+            }
+        }
+    }
 }

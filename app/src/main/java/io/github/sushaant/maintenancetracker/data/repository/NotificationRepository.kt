@@ -48,4 +48,14 @@ object NotificationRepository {
             it.isUnread
         }
     }
+
+    fun deleteVehicleNotifications(vehicleId: Int) {
+
+        _notifications.update { notifications ->
+
+            notifications.filterNot {
+                it.vehicleId == vehicleId
+            }
+        }
+    }
 }

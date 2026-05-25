@@ -31,4 +31,14 @@ object VehicleRepository {
             currentVehicles + vehicle
         }
     }
+
+    fun deleteVehicle(vehicleId: Int) {
+
+        _vehicles.update { vehicles ->
+
+            vehicles.filterNot {
+                it.id == vehicleId
+            }
+        }
+    }
 }

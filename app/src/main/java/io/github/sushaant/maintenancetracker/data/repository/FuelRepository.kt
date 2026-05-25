@@ -28,4 +28,14 @@ object FuelRepository {
             currentEntries + entry
         }
     }
+
+    fun deleteFuelEntries(vehicleId: Int) {
+
+        _fuelEntries.update { entries ->
+
+            entries.filterNot {
+                it.vehicleId == vehicleId
+            }
+        }
+    }
 }
