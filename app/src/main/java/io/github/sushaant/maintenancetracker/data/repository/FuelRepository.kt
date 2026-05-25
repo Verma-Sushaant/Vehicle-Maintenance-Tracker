@@ -1,26 +1,31 @@
 package io.github.sushaant.maintenancetracker.data.repository
 
-import androidx.compose.runtime.mutableStateListOf
 import io.github.sushaant.maintenancetracker.domain.dummy_data.FuelData
 import io.github.sushaant.maintenancetracker.domain.model.FuelEntry
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object FuelRepository {
 
-    private val fuelEntries =
-        mutableStateListOf<FuelEntry>().apply {
+    private val _fuelEntries =
+        MutableStateFlow(FuelData.fuelEntries)
 
-            addAll(FuelData.fuelEntries)
-        }
+    val fuelEntries =
+        _fuelEntries.asStateFlow()
 
     fun getFuelEntries(vehicleId: Int): List<FuelEntry> {
 
-        return fuelEntries.filter {
+        return _fuelEntries.value.filter {
             it.vehicleId == vehicleId
         }
     }
 
     fun addFuelEntry(entry: FuelEntry) {
 
-        fuelEntries.add(entry)
+        _fuelEntries.update { currentEntries ->
+
+            currentEntries + entry
+        }
     }
 }

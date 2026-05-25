@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import io.github.sushaant.maintenancetracker.navigation.AppNavigation
-import io.github.sushaant.maintenancetracker.ui.theme.MaintenanceTrackerTheme
+import io.github.sushaant.maintenancetracker.presentation.theme.MaintenanceTrackerTheme
 
 class MainActivity : ComponentActivity() {
 

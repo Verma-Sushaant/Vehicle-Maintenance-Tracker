@@ -1,19 +1,51 @@
 package io.github.sushaant.maintenancetracker.data.repository
 
-import androidx.compose.runtime.mutableStateListOf
-import io.github.sushaant.maintenancetracker.domain.dummy_data.NotificationData
 import io.github.sushaant.maintenancetracker.domain.model.NotificationItem
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object NotificationRepository {
 
-    private val notifications =
-        mutableStateListOf<NotificationItem>().apply {
+    private val _notifications =
+        MutableStateFlow<List<NotificationItem>>(emptyList())
 
-            addAll(NotificationData.notifications)
-        }
+    val notifications =
+        _notifications.asStateFlow()
 
     fun getNotifications(): List<NotificationItem> {
 
-        return notifications
+        return _notifications.value.reversed()
+    }
+
+    fun addNotification(
+        notification: NotificationItem
+    ) {
+
+        _notifications.update { current ->
+            current + notification
+        }
+    }
+
+    fun markAllAsRead() {
+
+        _notifications.update { current ->
+
+            current.map {
+                it.copy(isUnread = false)
+            }
+        }
+    }
+
+    fun clearNotifications() {
+
+        _notifications.value = emptyList()
+    }
+
+    fun unreadCount(): Int {
+
+        return _notifications.value.count {
+            it.isUnread
+        }
     }
 }

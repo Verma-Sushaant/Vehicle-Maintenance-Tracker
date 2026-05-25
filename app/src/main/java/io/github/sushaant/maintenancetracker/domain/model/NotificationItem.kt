@@ -10,5 +10,17 @@ data class NotificationItem(
 
     val time: String,
 
-    val isUnread: Boolean
+    val isUnread: Boolean = true,
+
+    val vehicleId: Int? = null,
+
+    val type: NotificationType
 )
+
+enum class NotificationType {
+
+    REMINDER,
+    MAINTENANCE,
+    FUEL,
+    GENERAL
+}

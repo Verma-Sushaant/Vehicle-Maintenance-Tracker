@@ -11,12 +11,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import io.github.sushaant.maintenancetracker.ui.screens.details.VehicleDetailScreen
-import io.github.sushaant.maintenancetracker.ui.screens.fuel.FuelLogScreen
-import io.github.sushaant.maintenancetracker.ui.screens.home.HomeScreen
-import io.github.sushaant.maintenancetracker.ui.screens.maintenance.MaintenanceScreen
-import io.github.sushaant.maintenancetracker.ui.screens.notification.NotificationScreen
-import io.github.sushaant.maintenancetracker.ui.screens.reminder.ReminderScreen
+import io.github.sushaant.maintenancetracker.domain.model.NotificationType
+import io.github.sushaant.maintenancetracker.presentation.screens.details.VehicleDetailScreen
+import io.github.sushaant.maintenancetracker.presentation.screens.fuel.FuelLogScreen
+import io.github.sushaant.maintenancetracker.presentation.screens.home.HomeScreen
+import io.github.sushaant.maintenancetracker.presentation.screens.maintenance.MaintenanceScreen
+import io.github.sushaant.maintenancetracker.presentation.screens.notification.NotificationScreen
+import io.github.sushaant.maintenancetracker.presentation.screens.reminder.ReminderScreen
 
 @Composable
 fun AppNavigation() {
@@ -37,10 +38,10 @@ fun AppNavigation() {
                     fullWidth
                 },
 
-                animationSpec = tween(300)
+                animationSpec = tween(220)
 
             ) + fadeIn(
-                animationSpec = tween(300)
+                animationSpec = tween(220)
             )
         },
 
@@ -49,13 +50,13 @@ fun AppNavigation() {
             slideOutHorizontally(
 
                 targetOffsetX = { fullWidth ->
-                    -fullWidth / 4
+                    -fullWidth / 8
                 },
 
-                animationSpec = tween(300)
+                animationSpec = tween(220)
 
             ) + fadeOut(
-                animationSpec = tween(300)
+                animationSpec = tween(220)
             )
         },
 
@@ -174,7 +175,7 @@ fun AppNavigation() {
 
             val vehicleId =
                 backStackEntry.arguments?.getInt("vehicleId")
-                    ?: 0
+                    ?: return@composable
 
             FuelLogScreen(
 
@@ -200,7 +201,7 @@ fun AppNavigation() {
 
             val vehicleId =
                 backStackEntry.arguments?.getInt("vehicleId")
-                    ?: 0
+                    ?: return@composable
 
             MaintenanceScreen(
 
@@ -226,7 +227,7 @@ fun AppNavigation() {
 
             val vehicleId =
                 backStackEntry.arguments?.getInt("vehicleId")
-                    ?: 0
+                    ?: return@composable
 
             ReminderScreen(
 
@@ -246,6 +247,52 @@ fun AppNavigation() {
 
                 onBackClick = {
                     navController.popBackStack()
+                },
+
+                onNotificationClick = { notification ->
+
+                    when (notification.type) {
+
+                        NotificationType.GENERAL -> {
+
+                            notification.vehicleId?.let {
+
+                                navController.navigate(
+                                    Routes.VehicleDetails.createRoute(it)
+                                )
+                            }
+                        }
+
+                        NotificationType.FUEL -> {
+
+                            notification.vehicleId?.let {
+
+                                navController.navigate(
+                                    Routes.Fuel.createRoute(it)
+                                )
+                            }
+                        }
+
+                        NotificationType.MAINTENANCE -> {
+
+                            notification.vehicleId?.let {
+
+                                navController.navigate(
+                                    Routes.Maintenance.createRoute(it)
+                                )
+                            }
+                        }
+
+                        NotificationType.REMINDER -> {
+
+                            notification.vehicleId?.let {
+
+                                navController.navigate(
+                                    Routes.Reminder.createRoute(it)
+                                )
+                            }
+                        }
+                    }
                 }
             )
         }

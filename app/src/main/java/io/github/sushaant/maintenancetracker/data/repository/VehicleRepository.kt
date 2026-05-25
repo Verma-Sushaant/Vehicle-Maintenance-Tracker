@@ -3,29 +3,32 @@ package io.github.sushaant.maintenancetracker.data.repository
 import androidx.compose.runtime.mutableStateListOf
 import io.github.sushaant.maintenancetracker.domain.dummy_data.VehicleData
 import io.github.sushaant.maintenancetracker.domain.model.Vehicle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object VehicleRepository {
 
-    private val vehicles =
-        mutableStateListOf<Vehicle>().apply {
+    private val _vehicles = MutableStateFlow(VehicleData.vehicles)
 
-            addAll(VehicleData.vehicles)
-        }
+    val vehicles = _vehicles.asStateFlow()
 
     fun getVehicles(): List<Vehicle> {
 
-        return vehicles
+        return _vehicles.value
     }
 
     fun getVehicleById(id: Int): Vehicle? {
 
-        return vehicles.firstOrNull {
+        return _vehicles.value.firstOrNull {
             it.id == id
         }
     }
 
     fun addVehicle(vehicle: Vehicle) {
 
-        vehicles.add(vehicle)
+        _vehicles.update { currentVehicles ->
+            currentVehicles + vehicle
+        }
     }
 }
